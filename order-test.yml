@@ -1,0 +1,73 @@
+server:
+  port: 10004
+
+spring:
+  zipkin:
+    base-url: ${ZIPKIN_URL}
+  datasource:
+    druid:
+      url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/coffeedb?useUnicode=true&serverTimezone=CST&useSSL=false&characterEncoding=utf8&allowPublicKeyRetrieval=true
+      username: coffee
+      password: Coffee123!
+      initial-size: 2
+      max-active: 5
+      min-idle: 1
+      max-wait: 60000
+      max-open-prepared-statements: 20
+      validation-query: select 1
+      validation-query-timeout: 2000
+      test-on-borrow: false
+      test-on-return: false
+      test-while-idle: true
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      filters: stat
+
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        profile-enable: true
+
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        login-username: liudao
+        login-password: 123456
+
+  jackson:
+    default-property-inclusion: non_null
+
+  rabbitmq:
+    host: ${MQ_HOST}
+    port: ${MQ_PORT}
+    username: guest
+    password: guest
+  cloud:
+    stream:
+      bindings:
+        coffeeOut:
+          destination: order_message
+      binders:
+        defaultRabbit:
+          type: rabbit
+
+feign:
+  hystrix:
+    enabled: true
+eureka:
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+  client:
+    healthcheck:
+      enabled: true
+    registry-fetch-interval-seconds: 5
+    serviceUrl:
+      defaultZone: http://icoffee_discovery_dev:dev123@${EUREKA_URL}/eureka/
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
+  packagesToScan: vip.testops.coffee.order.controllers
